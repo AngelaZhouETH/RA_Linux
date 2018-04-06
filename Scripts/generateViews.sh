@@ -17,7 +17,7 @@
 	suncg_dir="/home/moyuan/Documents/RA/Data_raw/house/"
 	toolbox="/home/moyuan/Documents/RA/ToolBox"
 	modelmapping=${toolbox}/SUNCGtoolbox-spyridon/metadata
-	segment_type=$INST_ONLY
+	segment_type=$CAT_ONLY
 	imagesPerView=4
 
 	# Parse args and assign values
@@ -81,37 +81,37 @@
 			cd $suncg_dir$eachfile
 			find . -name "000*.png" -type f -delete
 			find . -name "000*.jpg" -type f -delete
-			find . -name "outputcam*" -type f -delete	
+			# find . -name "outputcam*" -type f -delete	
 
 			# execute SUNCG tools in order to generate views
 			cd $suncg_dir$eachfile && ls
 			pwd
-			# $tools_dir/scn2scn house.json house.obj
+			$tools_dir/scn2scn house.json house.obj
 			$tools_dir/scn2cam house.json outputcamerafile -categories $modelmapping/ModelCategoryMapping.csv -v
-			# if [ $segment_type -eq $INST_ONLY ]; then
-			# 	echo "***"
-			# 	echo "GENERATE instance only."
-			# 	imagesPerView=4
-			# 	$tools_dir/scn2img house.json outputcamerafile ./ -capture_instance_images -capture_color_images -capture_depth_images -capture_kinect_images -v
-			# elif [ $segment_type -eq $CAT_ONLY ]; then
-			# 	echo "***"
-			# 	echo "GENARATE category only."
-			# 	imagesPerView=4
-			# 	$tools_dir/scn2img house.json outputcamerafile ./ -categories $modelmapping/ModelCategoryMapping.csv -v
-			# else
-			# 	echo "***"
-			# 	echo "GENARATE instance and category."
-			# 	imagesPerView=5
-			# 	$tools_dir/scn2img house.json outputcamerafile ./ -capture_instance_images -capture_color_images -capture_depth_images -capture_kinect_images -categories $modelmapping/ModelCategoryMapping.csv -v
-			# fi
+			if [ $segment_type -eq $INST_ONLY ]; then
+				echo "***"
+				echo "GENERATE instance only."
+				imagesPerView=4
+				$tools_dir/scn2img house.json outputcamerafile ./ -capture_instance_images -capture_color_images -capture_depth_images -capture_kinect_images -v
+			elif [ $segment_type -eq $CAT_ONLY ]; then
+				echo "***"
+				echo "GENARATE category only."
+				imagesPerView=4
+				$tools_dir/scn2img house.json outputcamerafile ./ -categories $modelmapping/ModelCategoryMapping.csv -v
+			else
+				echo "***"
+				echo "GENARATE instance and category."
+				imagesPerView=5
+				$tools_dir/scn2img house.json outputcamerafile ./ -capture_instance_images -capture_color_images -capture_depth_images -capture_kinect_images -categories $modelmapping/ModelCategoryMapping.csv -v
+			fi
 	   fi
 	done
 
-	# # Transfer views in the proper folder
-	# cd ${toolbox}/ReadSemanticGroundTruth
+	# Transfer views in the proper folder
+	cd ${toolbox}/ReadSemanticGroundTruth
 
-	# # Run matlab in command line mode using the input args
-	# matlab -nodisplay -nodesktop -r "clear all;reconstructionFolder = '${reconstruction_dir}';suncgFolder='${suncg_dir}';imagesPerView='${imagesPerView}';generateViews;clear;exit();"
+	# Run matlab in command line mode using the input args
+	matlab -nodisplay -nodesktop -r "clear all;reconstructionFolder = '${reconstruction_dir}';suncgFolder='${suncg_dir}';imagesPerView='${imagesPerView}';generateViews;clear;exit();"
 
 	# Delete duplicate images in Data_raw
 	# find ${suncg_dir} ! -name 'house.*' -type f -exec rm -f {} +
